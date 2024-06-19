@@ -8,6 +8,7 @@ from torchvision.transforms import ToTensor
 from ResNet.src.dataprovider.data_setter import MnistDataSetter
 from ResNet.src.dataprovider.data_loader import MnistDataLoader
 from ResNet.src.model.ResNet.model import ResNet, BasicBlock, Bottleneck
+from ResNet.src.model.ResNet.loss import cross_entropy_loss
 from ResNet.src.model.ResNet.metric import accuracy
 from ResNet.src.train.trainer import Trainer
 
@@ -29,7 +30,7 @@ def main(model_arch, batch_size=64, epochs=10, num_classes=10, in_channels=1, lr
 
     ## Optimizer, loss function, metric
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = cross_entropy_loss
     metric_fn = accuracy
 
     ## Trainer
