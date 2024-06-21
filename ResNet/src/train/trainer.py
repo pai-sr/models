@@ -1,4 +1,5 @@
 from base.base_trainer import BaseTrainer
+from ResNet.src.utils.eval import eval_epoch
 import torch
 from tqdm import tqdm
 
@@ -23,10 +24,10 @@ class Trainer(BaseTrainer):
             acc = self.metric_fn(pred, y)
             epoch_acc += acc
 
-        return (epoch_loss / (self.train_data_loader.dataset.__len__()
-                                     / self.train_data_loader.batch_size)
-                , epoch_acc / (self.train_data_loader.dataset.__len__()
-                                     / self.train_data_loader.batch_size))
+        return (eval_epoch('loss', epoch_loss, self.train_data_loader.dataset.__len__(),
+                         self.train_data_loader.batch_size, False)
+                , eval_epoch('accuracy', epoch_acc, self.train_data_loader.dataset.__len__(),
+                            self.train_data_loader.batch_size))
 
     def validate(self):
         val_loss = 0
@@ -45,7 +46,7 @@ class Trainer(BaseTrainer):
                 acc = self.metric_fn(pred, y)
                 val_acc += acc
 
-        return (val_loss / (self.valid_data_loader.dataset.__len__()
-                                     / self.valid_data_loader.batch_size)
-               , val_acc / (self.valid_data_loader.dataset.__len__()
-                                     / self.valid_data_loader.batch_size))
+        return (eval_epoch('loss', val_loss, self.valid_data_loader.dataset.__len__(),
+                         self.valid_data_loader.batch_size, False)
+                , eval_epoch('accuracy', val_acc, self.valid_data_loader.dataset.__len__(),
+                            self.valid_data_loader.batch_size))

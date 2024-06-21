@@ -42,11 +42,15 @@ def main(model_arch, batch_size=64, epochs=10, num_classes=10, in_channels=1, lr
                       valid_data_loader=valid_dl,
                       logger=logger)
 
-    train_loss, train_acc = trainer.train(epochs)
-    logger.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc}")
+    train_loss, train_metrics = trainer.train(epochs)
+    log_msg = f"Train Loss: {train_loss:.4f}"
+    log_msg += " | ".join([f'Train {k:} {v}' for k, v in train_metrics.items()])
+    logger.info(log_msg)
 
-    val_loss, val_acc = trainer.validate()
-    logger.info(f"Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_acc}")
+    val_loss, val_metrics = trainer.validate()
+    log_msg = f"Validation Loss: {val_loss:.4f}"
+    log_msg += " | ".join([f'Validation {k:} {v}' for k, v in val_metrics.items()])
+    logger.info(log_msg)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ResNet Model')
