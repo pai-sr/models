@@ -14,6 +14,8 @@ class BaseTrainer:
         self.train_data_loader = train_data_loader
         self.valid_data_loader = valid_data_loader
         self.logger = logger
+        self.args = args
+        self.kwargs = kwargs
 
     @abstractmethod
     def _train_epoch(self, epoch):
@@ -27,10 +29,12 @@ class BaseTrainer:
     def train(self, epochs):
 
         for epoch in range(epochs):
-            loss, accuracy = self._train_epoch(epoch)
-            self.logger.info(f'Epoch: {epoch} | Loss: {loss:.4f} | Accuracy: {accuracy}')
+            loss, metrics = self._train_epoch(epoch)
+            log_msg = f'Epoch: {epoch} | Loss: {loss:.4f} | '
+            log_msg += " | ".join([f'{k:} {v}' for k, v in metrics.items()])
+            self.logger.info(log_msg)
 
-        return loss, accuracy
+        return loss, metrics
 
     @abstractmethod
     def validate(self):
