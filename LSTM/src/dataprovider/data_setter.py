@@ -18,7 +18,6 @@ class StockDataSetter(BaseDataSetter):
         sscaler = StandardScaler()
 
         data = self.data
-        data = data[data["Name"] == "AAPL"]
         if 'Name' in self.data.columns:
             self.data.drop('Name', axis=1, inplace=True)
             self.data.drop(self.index_column, axis=1, inplace=True)
