@@ -202,6 +202,7 @@ class Transformer(BaseModel):
         self.norm_eps = norm_eps
         self.vocab_size = vocab_size
         self.n_layers = n_layers
+        self.n_heads = n_heads
         self.max_seq_len = max_seq_len
         self.rope_theta = rope_theta
         super().__init__()
