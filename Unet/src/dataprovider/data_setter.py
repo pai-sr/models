@@ -8,7 +8,8 @@ import torch
 from torchvision import transforms
 
 from base.base_data_setter import BaseDataSetter
-from Unet.utils import palette
+from Unet.src.utils import palette
+
 
 class CocoStuff10k(BaseDataSetter):
     def __init__(self, warp_image = True, **kwargs):

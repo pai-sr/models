@@ -2,7 +2,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from base.base_data_loader import BaseDataLoader
-from Unet.dataprovider.data_setter import CocoStuff10k, CocoStuff164k
+from Unet.src.dataprovider.data_setter import CocoStuff10k, CocoStuff164k
 
 class VisionDataLoader(BaseDataLoader):
     def __init__(self, dataset, batch_size, num_workers=1, val_split=0.0, shuffle=True, *args, **kwargs):

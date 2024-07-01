@@ -2,9 +2,9 @@ import argparse
 import logging
 import torch.optim as optim
 
-from Unet.dataprovider.data_loader import COCO
-from Unet.model import model, loss, metric
-from Unet.train.trainer import Trainer
+from Unet.src.dataprovider.data_loader import COCO
+from Unet.src.model import loss, model, metric
+from Unet.src.train.trainer import Trainer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

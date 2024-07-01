@@ -4,7 +4,7 @@ import torch.nn as nn
 from tqdm import tqdm
 
 from base.base_trainer import BaseTrainer
-from Unet.model.metric import AverageMeter, eval_metrics
+from Unet.src.model.metric import AverageMeter, eval_metrics
 
 class Trainer(BaseTrainer):
     def __init__(self, *args, **kwargs):
