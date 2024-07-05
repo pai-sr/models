@@ -130,7 +130,7 @@ class Tokenizer:
             )
 
         if len(t) < seq_len:
-            t.extend([0] * (seq_len - len(t)))
+            t.extend([-1] * (seq_len - len(t)))
 
         # prepending the beginning-of-sequence token
         if bos:

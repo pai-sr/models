@@ -73,7 +73,7 @@ def repeat_kv(x: torch.Tensor, n_rep: int) -> torch.Tensor:
 class Attention(BaseModel):
     def __init__(self, dim=4096, n_layers=32, n_heads=32, n_kv_heads=None,
                  vocab_size=-1, multiple_of=256, ffn_dim_multiplier=None,
-                 norm_eps=1e-5, rope_theta=50000, max_seq_len=2048):
+                 norm_eps=1e-5, rope_theta=50000.0, max_seq_len=2048):
         super().__init__()
         self.dim = dim
         self.n_layers = n_layers
@@ -198,7 +198,7 @@ class TransformerBlock(BaseModel):
 class Transformer(BaseModel):
     def __init__(self, dim=4096, n_layers=32, n_heads=32, n_kv_heads=None,
                  vocab_size=-1, multiple_of=256, ffn_dim_multiplier=None,
-                 norm_eps=1e-5, rope_theta=500000, max_seq_len=2048):
+                 norm_eps=1e-5, rope_theta=50000.0, max_seq_len=2048):
         self.dim = dim
         self.norm_eps = norm_eps
         self.vocab_size = vocab_size
@@ -294,7 +294,7 @@ def print_model_parameters(model):
 class LLamaForSequenceClassification(BaseModel):
     def __init__(self, num_labels, dim=4096, n_layers=32, n_heads=32, n_kv_heads=None,
                  vocab_size=-1, multiple_of=256, ffn_dim_multiplier=None,
-                 norm_eps=1e-5, rope_theta=500000, max_seq_len=2048):
+                 norm_eps=1e-5, rope_theta=50000.0, max_seq_len=2048):
         super().__init__()
         self.num_labels = num_labels
         self.model = Transformer(dim, n_layers, n_heads, n_kv_heads, vocab_size, multiple_of, ffn_dim_multiplier,
@@ -307,7 +307,7 @@ class LLamaForSequenceClassification(BaseModel):
 
         batch_size = tokens.shape[0]
 
-        seq_len = torch.eq(tokens, 0).int().argmax(-1) - 1 # pad token id is 0
+        seq_len = torch.eq(tokens, -1).int().argmax(-1) - 1 # pad token id is -1
         seq_len = seq_len % tokens.shape[-1]
 
         pooled_logits = logits[torch.arange(batch_size), seq_len]
