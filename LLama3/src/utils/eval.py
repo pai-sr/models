@@ -1,6 +1,6 @@
 
-def eval_epoch(value_name, value, data_len, batch_size, output_dict=True):
+def eval_epoch(value_name, value, data_len, output_dict=True):
     if output_dict:
-        return {value_name : value / (data_len / batch_size)}
+        return {value_name : value / (data_len)}
     else:
-        return value / (data_len / batch_size)
+        return value / (data_len)

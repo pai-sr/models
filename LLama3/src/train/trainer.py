@@ -24,9 +24,9 @@ class Trainer(BaseTrainer):
             epoch_acc += acc
 
         return (eval_epoch('loss', epoch_loss, self.train_data_loader.dataset.__len__(),
-                         self.train_data_loader.batch_size, False)
+                          False)
                 , eval_epoch('accuracy', epoch_acc, self.train_data_loader.dataset.__len__(),
-                            self.train_data_loader.batch_size))
+                            ))
 
     def validate(self):
         val_loss = 0
@@ -44,6 +44,6 @@ class Trainer(BaseTrainer):
                 val_acc += acc
 
         return (eval_epoch('loss', val_loss, self.valid_data_loader.dataset.__len__(),
-                         self.valid_data_loader.batch_size, False)
+                         False)
                 , eval_epoch('accuracy', val_acc, self.valid_data_loader.dataset.__len__(),
-                            self.valid_data_loader.batch_size))
+                            ))
