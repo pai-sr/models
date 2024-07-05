@@ -307,7 +307,7 @@ class LLamaForSequenceClassification(BaseModel):
 
         batch_size = tokens.shape[0]
 
-        seq_len = torch.eq(tokens, -1).int().argmax(-1) - 1 # pad token id is -1
+        seq_len = torch.eq(tokens, 0).int().argmax(-1) - 1 # pad token id is 0
         seq_len = seq_len % tokens.shape[-1]
 
         pooled_logits = logits[torch.arange(batch_size), seq_len]
