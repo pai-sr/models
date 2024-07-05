@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 import torch
 import torch.nn.functional as F
 from torch import nn
+from torch.nn import CrossEntropyLoss
 
 from base.base_model import BaseModel
 
@@ -72,7 +73,7 @@ def repeat_kv(x: torch.Tensor, n_rep: int) -> torch.Tensor:
 class Attention(BaseModel):
     def __init__(self, dim=4096, n_layers=32, n_heads=32, n_kv_heads=None,
                  vocab_size=-1, multiple_of=256, ffn_dim_multiplier=None,
-                 norm_eps=1e-5, rope_theta=500000, max_seq_len=2048):
+                 norm_eps=1e-5, rope_theta=50000, max_seq_len=2048):
         super().__init__()
         self.dim = dim
         self.n_layers = n_layers
@@ -237,7 +238,6 @@ class Transformer(BaseModel):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    @torch.inference_mode()
     def forward(self, tokens, targets=None):
         _bsz, seqlen = tokens.shape
         h = self.tok_embeddings(tokens) # (bs, seq_len) -> (bs, seq_len, dim)
@@ -249,6 +249,7 @@ class Transformer(BaseModel):
             h = layer(h, freqs_cos, freqs_sin) # (bs, seqlen, dim)
         h = self.norm(h) # (bs, seqlen, dim)
 
+        """
         if targets is not None:
             logits = self.output(h).float()
             self.last_loss = F.cross_entropy(logits.view(-1, logits.size(-1)),
@@ -256,9 +257,10 @@ class Transformer(BaseModel):
         else:
             logits = self.output(h[:, [-1], :])
             self.last_loss = None
+        """
 
         # (bs, seqlen, vocab_size)
-        return logits
+        return h
 
     @torch.inference_mode()
     def generate(self, tokens, max_new_tokens, temperature=1.0, top_k=None, eos=None):
@@ -289,3 +291,30 @@ def print_model_parameters(model):
             print(f"Layer: {name}, Parameters: {param.numel()}")
     print(f"Total of parameters: {param_sum}")
 
+class LLamaForSequenceClassification(BaseModel):
+    def __init__(self, num_labels, dim=4096, n_layers=32, n_heads=32, n_kv_heads=None,
+                 vocab_size=-1, multiple_of=256, ffn_dim_multiplier=None,
+                 norm_eps=1e-5, rope_theta=500000, max_seq_len=2048):
+        super().__init__()
+        self.num_labels = num_labels
+        self.model = Transformer(dim, n_layers, n_heads, n_kv_heads, vocab_size, multiple_of, ffn_dim_multiplier,
+                        norm_eps, rope_theta, max_seq_len)
+        self.score = nn.Linear(dim, num_labels, bias=False)
+
+    def forward(self, tokens, targets=None):
+        hidden_states = self.model(tokens)
+        logits = self.score(hidden_states)
+
+        batch_size = tokens.shape[0]
+
+        seq_len = torch.eq(tokens, 0).int().argmax(-1) - 1 # pad token id is 0
+        seq_len = seq_len % tokens.shape[-1]
+
+        pooled_logits = logits[torch.arange(batch_size), seq_len]
+
+        loss = None
+        if targets is not None:
+            loss_fct = nn.CrossEntropyLoss()
+            loss = loss_fct(pooled_logits.view(-1, self.num_labels), targets.view(-1))
+
+        return pooled_logits.view(-1, self.num_labels)
