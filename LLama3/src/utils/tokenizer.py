@@ -76,6 +76,7 @@ class Tokenizer:
             *,
             bos: bool,
             eos: bool,
+            seq_len: int,
             allowed_special: Union[Literal["all"], AbstractSet[str]] = set(),
             disallowed_special: Union[Literal["all"], Collection[str]] = (),
     ) -> List[int]:
@@ -128,13 +129,20 @@ class Tokenizer:
                 )
             )
 
+        if len(t) < seq_len:
+            t.extend([0] * (seq_len - len(t)))
+
         # prepending the beginning-of-sequence token
         if bos:
             t.insert(0, self.bos_id)
 
-        # appending the end-of-sequence token
-        if eos:
-            t.append(self.eos_id)
+        if len(t) > seq_len:
+            # appending the end-of-sequence token
+            if eos:
+                t = t[:seq_len - 1]
+                t.append(self.eos_id)
+            else:
+                t = t[:seq_len]
         return t
 
     def decode(self, t: Sequence[int]) -> str:
