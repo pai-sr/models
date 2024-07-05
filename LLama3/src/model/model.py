@@ -312,9 +312,11 @@ class LLamaForSequenceClassification(BaseModel):
 
         pooled_logits = logits[torch.arange(batch_size), seq_len]
 
+        '''
         loss = None
         if targets is not None:
             loss_fct = nn.CrossEntropyLoss()
             loss = loss_fct(pooled_logits.view(-1, self.num_labels), targets.view(-1))
+        '''
 
         return pooled_logits.view(-1, self.num_labels)
