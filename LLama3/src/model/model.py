@@ -238,7 +238,7 @@ class Transformer(BaseModel):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, tokens, targets=None):
+    def forward(self, tokens, targets=None, generate=False):
         _bsz, seqlen = tokens.shape
         h = self.tok_embeddings(tokens) # (bs, seq_len) -> (bs, seq_len, dim)
 
@@ -249,15 +249,15 @@ class Transformer(BaseModel):
             h = layer(h, freqs_cos, freqs_sin) # (bs, seqlen, dim)
         h = self.norm(h) # (bs, seqlen, dim)
 
-        """
-        if targets is not None:
-            logits = self.output(h).float()
-            self.last_loss = F.cross_entropy(logits.view(-1, logits.size(-1)),
-                                             targets.view(-1), ignore_index=-1)
-        else:
-            logits = self.output(h[:, [-1], :])
-            self.last_loss = None
-        """
+        if generate:
+            if targets is not None:
+                logits = self.output(h).float()
+                self.last_loss = F.cross_entropy(logits.view(-1, logits.size(-1)),
+                                                 targets.view(-1), ignore_index=-1)
+            else:
+                logits = self.output(h[:, [-1], :])
+                self.last_loss = None
+            return logits
 
         # (bs, seqlen, vocab_size)
         return h
